@@ -1,6 +1,8 @@
 import mongoengine
 from src.utils.config import config 
 
+print("hello")
+
 def connect_to_db():
     try:
         connection = mongoengine.connect(db=config.db_name, host=config.connection_string)
