@@ -7,6 +7,8 @@ router = APIRouter()
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str
+    country: str
+    city : str
     full_name: str = None
     gender: str = None
 
@@ -20,6 +22,8 @@ async def register(auth: RegisterRequest):
         user = register_user(
             email=auth.email,
             password=auth.password,
+            country=auth.country,
+            city=auth.city,
             full_name=auth.full_name,
             gender=auth.gender
         )
