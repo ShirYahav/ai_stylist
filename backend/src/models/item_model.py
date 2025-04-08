@@ -4,6 +4,7 @@ class EmbeddedItem(me.EmbeddedDocument):
     item_id = me.ObjectIdField(required=True)
     type = me.StringField(required=True)
     gender = me.StringField()
+    price = me.FloatField()
     brand = me.StringField(required=True)
     color = me.ListField(me.StringField(), default=list)
     material = me.StringField()
@@ -24,6 +25,7 @@ class EmbeddedItem(me.EmbeddedDocument):
 class Item(me.Document):
     type = me.StringField(required=True)
     gender = me.StringField()
+    price = me.StringField(required=True)
     brand = me.StringField(required=True)
     color = me.ListField(me.StringField(), default=list)
     material = me.StringField()

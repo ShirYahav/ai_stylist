@@ -17,7 +17,7 @@ router = APIRouter()
 class SerpApiResult(BaseModel):
     title: str
     link: Optional[str]
-    price: Optional[float]
+    price: str
     store_name: Optional[str]
     thumbnail: Optional[str]
     country: Optional[str]

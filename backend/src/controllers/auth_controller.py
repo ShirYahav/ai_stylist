@@ -1,6 +1,9 @@
-from fastapi import APIRouter, HTTPException
+# user_controller.py
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, EmailStr
 from src.logic.auth_logic import register_user, login_user
+from src.utils.auth_utils import create_access_token
+from src.models.user_model import User
 
 router = APIRouter()
 
@@ -8,7 +11,7 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     password: str
     country: str
-    city : str
+    city: str
     full_name: str = None
     gender: str = None
 
@@ -37,7 +40,8 @@ async def register(auth: RegisterRequest):
 async def login(auth: LoginRequest):
     try:
         user = login_user(email=auth.email, password=auth.password)
-        return {"message": "Login successful", "user_id": str(user.id)}
+        token = create_access_token({"user_id": str(user.id)})
+        return {"access_token": token, "token_type": "bearer"}
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:

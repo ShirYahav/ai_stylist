@@ -47,6 +47,7 @@ def convert_result_to_item(result: dict) -> Item:
     item = Item(
         type=detect_type(title),
         gender=detect_gender(title),
+        price=result.get("price"),
         brand=result.get("store_name", "Unknown"),
         color=extract_colors(title),
         material=detect_material(title), 

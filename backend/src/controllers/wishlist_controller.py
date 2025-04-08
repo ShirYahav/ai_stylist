@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-from bson import ObjectId
 
 from src.logic.wishlist_logic import (
     add_item_to_wishlist,
@@ -15,7 +14,7 @@ router = APIRouter()
 class WishlistItemRequest(BaseModel):
     title: str
     link: Optional[str]
-    price: Optional[float]
+    price: float
     store_name: Optional[str]
     thumbnail: Optional[str]
     country: Optional[str]
