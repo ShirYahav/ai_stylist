@@ -2,6 +2,7 @@ import requests
 from datetime import datetime, timedelta
 from urllib.parse import quote
 from src.models.user_model import User
+import os
 
 def get_weather_and_time(user_id: str) -> dict:
     try:
@@ -15,7 +16,7 @@ def get_weather_and_time(user_id: str) -> dict:
     query = f"{city},{country}"
     query_encoded = quote(query) 
     
-    API_KEY = "863e117427bf5131451ed275f6f9b4ec" 
+    API_KEY = os.getenv("WEATHER_API")
     url = f"http://api.openweathermap.org/data/2.5/forecast?q={query_encoded}&appid={API_KEY}&units=metric"
     
     print("DEBUG: Fetching weather from:", url)

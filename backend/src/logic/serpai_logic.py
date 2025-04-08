@@ -5,7 +5,7 @@ from difflib import SequenceMatcher
 
 load_dotenv()
 
-SERPAPI_KEY = os.getenv("SERPAPI_KEY") or "b61e74cd48d2b447a8c220d4687c8f2417a2a766c5b5ca73bd20a6581bfb0fef"
+SERPAPI_KEY = os.getenv("SERPAPI_KEY") 
 
 TRUSTED_STORES = [
     "nike.com", "amazon.com", "zara.com", "adidas.com", "hm.com",
