@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Query
-from typing import Optional
 from src.logic.serpai_logic import search_google_shopping
 
 router = APIRouter()
