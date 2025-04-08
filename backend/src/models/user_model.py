@@ -5,6 +5,8 @@ class User(me.Document):
     email = me.StringField(required=True)
     password_hash = me.StringField(required=True)
     full_name = me.StringField()
+    country = me.StringField(required=True)
+    city = me.StringField(required=True)
     gender = me.StringField()    
     preferences = me.ReferenceField("Preferences",default=None)
     wardrobe = me.ReferenceField("Wardrobe",default=None)
