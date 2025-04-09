@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
 from typing import Optional
 from src.models.item_model import Item
+from src.models.user_model import User
 from src.logic.wardrobe_logic import (
     convert_result_to_item,
     add_item_to_category,
@@ -9,7 +10,9 @@ from src.logic.wardrobe_logic import (
     rename_category,
     delete_category,
     remove_wardrobe,
-    remove_item_from_category
+    get_wardrobe,
+    remove_item_from_category,
+    get_specific_item_from_wardrobe
 )
 
 router = APIRouter()
@@ -37,6 +40,9 @@ class DeleteCategoryRequest(BaseModel):
 class DeleteItemFromCategoryRequest(BaseModel):
     item_id: str
     category_name: str
+
+class getItemRequest(BaseModel):
+    item_id: str
     
 @router.post("/add-to-wardrobe")
 def add_to_closet(
@@ -113,3 +119,27 @@ def remove_wardrobe_endpoint(
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
+
+@router.get("/get-wardrobe")
+def get_wardrobe_endpoint(
+    user_id: str = Header(..., alias="user-id")
+):
+    try:
+        wardrobe = get_wardrobe(user_id)
+        return wardrobe
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+@router.get("/get-item-from-wardrobe")
+def get_specific_wardrobe_item(
+    req: getItemRequest,
+    user: str = Header(..., alias="user-id")
+):
+    try:
+        result = get_specific_item_from_wardrobe(user, req.item_id)
+        return result
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
