@@ -4,6 +4,8 @@ from pydantic import BaseModel, EmailStr
 from src.logic.auth_logic import register_user, login_user
 from src.utils.auth_utils import create_access_token
 from src.models.user_model import User
+from typing import Optional
+from src.utils.auth_utils import get_current_user_optional  
 
 router = APIRouter()
 
@@ -40,9 +42,11 @@ async def register(auth: RegisterRequest):
 async def login(auth: LoginRequest):
     try:
         user = login_user(email=auth.email, password=auth.password)
-        token = create_access_token({"user_id": str(user.id)})
+        token = create_access_token({"user-id": str(user.id)})
+        
         return {"access_token": token, "token_type": "bearer"}
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    

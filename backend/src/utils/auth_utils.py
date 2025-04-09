@@ -4,10 +4,12 @@ from fastapi import Header, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from src.models.user_model import User
 from bson import ObjectId
-from typing import Optional
 from dotenv import load_dotenv
+from typing import Optional
 import os
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False) 
+
+
 
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -24,10 +26,10 @@ async def get_current_user_optional(token: Optional[str] = Depends(oauth2_scheme
         return None
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("sub")
+        user_id = payload.get("user-id")
         if user_id is None:
             return None
-        user = User.objects(id=user_id).first()
+        user = User.objects(id=ObjectId(user_id)).first()  # 👈 המרה!
         return user
     except JWTError:
         return None
