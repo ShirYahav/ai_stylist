@@ -1,10 +1,13 @@
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
-from fastapi import Header, HTTPException
+from fastapi import Header, HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer
 from src.models.user_model import User
 from bson import ObjectId
+from typing import Optional
 from dotenv import load_dotenv
 import os
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False) 
 
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -16,16 +19,15 @@ def create_access_token(data: dict, expires_delta: timedelta = timedelta(hours=1
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-def get_current_user(authorization: str = Header(...)) -> User:
+async def get_current_user_optional(token: Optional[str] = Depends(oauth2_scheme)) -> Optional[User]:
+    if token is None:
+        return None
     try:
-        token = authorization.replace("Bearer ", "")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("user_id")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        user = User.objects(id=ObjectId(user_id)).first()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+        user_id = payload.get("sub")
+        if user_id is None:
+            return None
+        user = User.objects(id=user_id).first()
         return user
     except JWTError:
-        raise HTTPException(status_code=403, detail="Token is invalid or expired")
+        return None
