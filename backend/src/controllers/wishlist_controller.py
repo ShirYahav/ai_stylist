@@ -6,7 +6,9 @@ from src.logic.wishlist_logic import (
     add_item_to_wishlist,
     remove_item_from_wishlist,
     remove_wishlist,
-    move_item_from_wishlist_to_wardrobe
+    move_item_from_wishlist_to_wardrobe,
+    get_specific_item_from_wishlist,
+    get_wishlist
 )
 
 router = APIRouter()
@@ -14,7 +16,7 @@ router = APIRouter()
 class WishlistItemRequest(BaseModel):
     title: str
     link: Optional[str]
-    price: float
+    price: str
     store_name: Optional[str]
     thumbnail: Optional[str]
     country: Optional[str]
@@ -27,6 +29,10 @@ class WishlistMoveRequest(BaseModel):
     item_id: str
     category: str
 
+
+class getItemRequest(BaseModel):
+    item_id: str
+    
 # ✅ הוספה ל־Wishlist
 @router.post("/add-item")
 def add_to_wishlist(
@@ -67,5 +73,27 @@ def delete_wishlist(
 ):
     try:
         return remove_wishlist(user_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/get-item-from-wishlist")
+def get_specific_wishlist_item(
+    req: getItemRequest,
+    user: str = Header(..., alias="user-id")
+):
+    try:
+        result = get_specific_item_from_wishlist(user, req.item_id)
+        return result
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
+    
+@router.get("/get-wishlist")
+def get_wishlist_endpoint(
+    user_id: str = Header(..., alias="user-id")
+):
+    try:
+        return get_wishlist(user_id)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
