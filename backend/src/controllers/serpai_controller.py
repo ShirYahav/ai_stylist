@@ -10,7 +10,7 @@ router = APIRouter()
 @router.get("/shopping")
 def shopping_search(
     q: str = Query(..., description="Search query, e.g. 'white midi skirt'"),
-    user: Optional[User] = Depends(get_current_user_optional)  # 👈 Optional
+    user: Optional[User] = Depends(get_current_user_optional)  
 ):
     results = search_google_shopping(q, user)
     return {
@@ -22,7 +22,7 @@ def shopping_search(
 @router.post("/shopping/image")
 async def shopping_image_search(
     image: UploadFile = File(...),
-    user: User = Depends(get_current_user)
+    user: Optional[User] = Depends(get_current_user_optional)  
 ):
     image_bytes = await image.read()
     
