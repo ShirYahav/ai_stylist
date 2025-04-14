@@ -9,3 +9,4 @@ venv/
 .env
 .vscode
 blip-finetuned-fashion/
+node_modules/

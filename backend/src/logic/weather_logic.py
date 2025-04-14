@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from urllib.parse import quote
 from src.models.user_model import User
 import os
+import json
 
 def get_weather_and_time(user_id: str) -> dict:
     try:
@@ -19,22 +20,19 @@ def get_weather_and_time(user_id: str) -> dict:
     API_KEY = os.getenv("WEATHER_API")
     url = f"http://api.openweathermap.org/data/2.5/forecast?q={query_encoded}&appid={API_KEY}&units=metric"
     
-    print("DEBUG: Fetching weather from:", url)
     response = requests.get(url)
-    print("DEBUG: Response code:", response.status_code)
-    print("DEBUG: Response text:", response.text)
-    
+
     if response.status_code != 200:
         raise ValueError("Failed to retrieve weather data")
     
     weather_json = response.json()
+    # print(json.dumps(weather_json, indent=2))
     try:
         forecast = weather_json["list"][0]
         description = forecast["weather"][0]["description"]
         temperature = forecast["main"]["temp"]
         tz_offset = weather_json["city"].get("timezone", 0)
     except (KeyError, IndexError) as e:
-        print("DEBUG: Exception during data extraction:", e)
         raise ValueError("Weather data incomplete")
     
     local_time = datetime.utcnow() + timedelta(seconds=tz_offset)

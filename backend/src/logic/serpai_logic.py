@@ -78,11 +78,14 @@ def calculate_score(item, query):
     score = (similarity * 3) + (trusted_score * 1.5)
     return score
 
-def search_google_shopping(query: str, user: User):
+def search_google_shopping(query: str, user: User = None): 
     countries = ['us', 'il', 'uk', 'ca', 'cn', 'au']
     results_list = []
 
-    to_currency, currency_symbol = get_currency_info_by_country(user.country)
+    if user and user.country:
+        to_currency, currency_symbol = get_currency_info_by_country(user.country)
+    else:
+        to_currency, currency_symbol = "USD", "$"  
 
     for gl_code in countries:
         params = {
