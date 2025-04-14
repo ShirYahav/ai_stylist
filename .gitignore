@@ -8,4 +8,5 @@ venv/
 *.sqlite3
 .env
 .vscode
+blip-finetuned-fashion/
 node_modules/
