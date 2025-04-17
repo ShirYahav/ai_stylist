@@ -3,16 +3,22 @@ import os
 from dotenv import load_dotenv
 from difflib import SequenceMatcher
 from src.models.user_model import User
+import re
 
 load_dotenv()
 SERPAPI_KEY = os.getenv("SERPAPI_KEY")
+
+STOPWORDS = {
+    "a","an","the","in","on","and","of","with","to","for",
+    "solid","cotton","weave","down", "-"
+}
 
 TRUSTED_STORES = [
     "nike.com", "amazon.com", "zara.com", "adidas.com", "hm.com",
     "asos.com", "shein.com", "castro.com", "terminalx.com", "ksp.co.il",
     "next.co.uk", "ebay.com", "bestbuy.com", "walmart.com", "aliexpress.com",
     "ebags.com", "sneakersnstuff.com", "footlocker.com", "jd.com", "renuar.com",
-    "gap.com", "oldnavy.com", "target.com", "uniqlo.com", "mango.com",
+    "gap.com", "oldnavy.com", "target.com", "uniqlo.com", "mango.com", "ralphlauren.com"
 ]
 
 country_to_currency = {
@@ -30,6 +36,11 @@ country_to_currency = {
     "Japan": ("JPY", "¥"),
     "India": ("INR", "₹"),
 }
+
+def clean_query(query: str) -> str:
+    tokens = re.findall(r"\w+", query)
+    tokens = [t for t in tokens if t.lower() not in STOPWORDS]
+    return " ".join(tokens)
 
 def get_currency_info_by_country(country_name):
     return country_to_currency.get(country_name, ("USD", "$"))
@@ -79,7 +90,8 @@ def calculate_score(item, query):
     return score
 
 def search_google_shopping(query: str, user: User = None): 
-    countries = ['us', 'il', 'uk', 'ca', 'cn', 'au']
+    # countries = ['us', 'il', 'uk', 'ca', 'cn', 'au']
+    countries = ['uk']
     results_list = []
 
     if user and user.country:
@@ -90,7 +102,7 @@ def search_google_shopping(query: str, user: User = None):
     for gl_code in countries:
         params = {
             "engine": "google_shopping",
-            "q": query,
+            "q": clean_query(query),
             "hl": "en",
             "gl": gl_code,
             "api_key": SERPAPI_KEY
@@ -101,7 +113,7 @@ def search_google_shopping(query: str, user: User = None):
             response.raise_for_status()
             data = response.json()
         except Exception as e:
-            print(f"שגיאה עבור המדינה {gl_code}: {e}")
+            print(f"error for country {gl_code}: {e}")
             continue
 
         shopping_results = data.get("shopping_results", [])
