@@ -102,17 +102,14 @@ def remove_wishlist(user_id: str):
 def move_item_from_wishlist_to_wardrobe(user_id: str, item_id: str, category: str):
     item_object_id = ObjectId(item_id)
 
-    # שליפת הפריט מה-Item
     item = Item.objects(id=item_object_id).first()
     if not item:
         raise ValueError("Item does not exist.")
 
-    # שליפת ה-Wishlist
     wishlist = Wishlist.objects(user_id=user_id).first()
     if not wishlist:
         raise ValueError("Wishlist does not exist.")
 
-    # בדיקה אם הפריט קיים ב-wishlist
     found = False
     for emb in wishlist.items:
         if hasattr(emb, "item_id") and emb.item_id == item_object_id:
@@ -123,14 +120,12 @@ def move_item_from_wishlist_to_wardrobe(user_id: str, item_id: str, category: st
     if not found:
         raise ValueError("Item not found in wishlist.")
 
-    # הסרה מה-wishlist
     wishlist.items = [
         emb for emb in wishlist.items
         if not (hasattr(emb, "item_id") and emb.item_id == item_object_id)
     ]
     wishlist.save()
 
-    # שליפת הארון
     wardrobe = Wardrobe.objects(user_id=user_id).first()
     if not wardrobe:
         raise ValueError("Wardrobe does not exist.")
@@ -144,14 +139,12 @@ def move_item_from_wishlist_to_wardrobe(user_id: str, item_id: str, category: st
         if emb.image_url == item.image_url:
             raise ValueError("Item already exists in wardrobe category.")
 
-    # הוספה לארון
     embedded = EmbeddedItem.from_item(item)
     category_data.items.append(embedded)
     category_data.count += 1
     wardrobe.wardrobeCount += 1
     wardrobe.save()
 
-    # עדכון usage count של הפריט
     item.update(inc__usage_count=1)
 
     return {
@@ -204,6 +197,6 @@ def get_wishlist(user_id: str):
                 "image_url": item.image_url
             })
         except Item.DoesNotExist:
-            continue  # אם פריט לא קיים במסד, פשוט מדלגים עליו
+            continue
 
     return wishlist_data

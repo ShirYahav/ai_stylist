@@ -66,11 +66,10 @@ def create_category(user_id: str, category_name: str):
     except DoesNotExist:
         wardrobe = Wardrobe(user_id=user_id, categories={})
 
-    # בדיקה אם קיימת כבר קטגוריה (case insensitive)
+
     if category_name.lower() in (name.lower() for name in wardrobe.categories.keys()):
         raise ValueError(f"Category '{category_name}' already exists.")
 
-    # יצירת קטגוריה חדשה עם אובייקט מסוג CategoryData
     wardrobe.categories[category_name] = CategoryData(items=[], count=0)
     wardrobe.save()
     return wardrobe
@@ -127,12 +126,10 @@ def add_item_to_category(user_id: str, item: Item, category: str):
 
     category_data = wardrobe.categories[category]
 
-    # בדיקה אם הפריט כבר קיים בקטגוריה
     for embedded in category_data.items:
         if embedded.image_url == item.image_url:
             raise ValueError("Item is already in the wardrobe category.")
-
-    # בדיקה אם הפריט קיים ב-wishlist
+        
     from src.models.wishlist_model import Wishlist
     wishlist = Wishlist.objects(user_id=user_id).first()
     if wishlist:
@@ -140,14 +137,12 @@ def add_item_to_category(user_id: str, item: Item, category: str):
             if embedded.image_url == item.image_url:
                 raise ValueError("Item exists in wishlist and cannot be added to wardrobe.")
 
-    # שמירת הפריט למסד
     if not item.id:
         item.usage_count = 1
         item.save()
     else:
         item.update(inc__usage_count=1)
 
-    # הוספת הפריט לקטגוריה
     embedded = EmbeddedItem.from_item(item)
     category_data.items.append(embedded)
     category_data.count += 1
@@ -160,7 +155,7 @@ def add_item_to_category(user_id: str, item: Item, category: str):
 
 
 def remove_item_from_category(user_id: str, item: Item, category: str):
-    from src.models.wishlist_model import Wishlist  # אם צריך
+    from src.models.wishlist_model import Wishlist  
 
     try:
         wardrobe = Wardrobe.objects.get(user_id=user_id)
@@ -173,22 +168,18 @@ def remove_item_from_category(user_id: str, item: Item, category: str):
     category_data = wardrobe.categories[category]
     original_count = len(category_data.items)
 
-    # מסנן החוצה את הפריט לפי image_url
     category_data.items = [
         emb for emb in category_data.items
         if emb.image_url != item.image_url
     ]
 
-    # אם שום דבר לא השתנה – הפריט לא היה שם בכלל
     if len(category_data.items) == original_count:
         raise ValueError("Item not found in category.")
 
-    # עדכון המונים
     category_data.count -= 1
     wardrobe.wardrobeCount -= 1
     wardrobe.save()
 
-    # עדכון מונה שימוש של הפריט
     item.update(dec__usage_count=1)
     item.reload()
     if item.usage_count <= 0:

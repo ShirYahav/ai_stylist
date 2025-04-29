@@ -32,8 +32,7 @@ class WishlistMoveRequest(BaseModel):
 
 class getItemRequest(BaseModel):
     item_id: str
-    
-# ✅ הוספה ל־Wishlist
+
 @router.post("/add-item")
 def add_to_wishlist(
     result: WishlistItemRequest,
@@ -44,7 +43,6 @@ def add_to_wishlist(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# ❌ הסרה מ־Wishlist
 @router.delete("/remove-item")
 def remove_from_wishlist(
     data: WishlistItemDeleteRequest,
@@ -55,7 +53,6 @@ def remove_from_wishlist(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# 🔁 העברה ל־Wardrobe
 @router.post("/move-to-wardrobe")
 def move_to_wardrobe(
     data: WishlistMoveRequest,
@@ -66,7 +63,6 @@ def move_to_wardrobe(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# 🗑️ מחיקת Wishlist שלם
 @router.delete("/delete-wishlist")
 def delete_wishlist(
     user_id: str = Header(..., alias="user-id")

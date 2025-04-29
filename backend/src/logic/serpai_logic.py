@@ -90,7 +90,6 @@ def calculate_score(item, query):
     return score
 
 def search_google_shopping(query: str, user: User = None): 
-    # countries = ['us', 'il', 'uk', 'ca', 'cn', 'au']
     countries = ['uk']
     results_list = []
 

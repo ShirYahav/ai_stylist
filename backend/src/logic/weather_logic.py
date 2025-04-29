@@ -26,7 +26,6 @@ def get_weather_and_time(user_id: str) -> dict:
         raise ValueError("Failed to retrieve weather data")
     
     weather_json = response.json()
-    # print(json.dumps(weather_json, indent=2))
     try:
         forecast = weather_json["list"][0]
         description = forecast["weather"][0]["description"]
